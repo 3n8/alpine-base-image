@@ -1,23 +1,23 @@
 # Alpine Base Image
 
-A minimal Alpine Linux base image with supervisor, dumb-init, and PUID/PGID support for running containers as non-root users.
+A minimal Alpine Linux base image with supervisor, dumb-init, and user support for running containers as non-root users.
 
 ## Features
 
 - **Alpine Linux** - Lightweight base (~169MB)
 - **dumb-init** - Proper signal handling and zombie process reaping
 - **Supervisor** - Process management with logging
-- **User/Group Mapping** - Run as any UID:GID via environment variables
+- **User/Group Mapping** - Run as any UID:GID via docker-compose user: directive
 - **TZ Support** - Configurable timezone
 
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PUID` | 1050 | User ID to run as |
-| `PGID` | 1050 | Group ID to run as |
 | `UMASK` | 000 | File permissions mask |
 | `TZ` | UTC | Timezone (e.g., Europe/London, America/New_York) |
+
+The `user:` directive in docker-compose handles UID/GID - no environment variables needed.
 
 ## Volumes
 
@@ -36,8 +36,6 @@ services:
     restart: always
     user: "${PUID}:${PGID}"
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
       - UMASK=${UMASK}
       - TZ=${TZ}
     volumes:
@@ -47,8 +45,8 @@ services:
 ## How It Works
 
 1. **Entry Point**: `dumb-init` handles signals (SIGTERM, SIGINT) for clean shutdown
-2. **Init Script**: Sets up timezone, adjusts user/group IDs, sets permissions
-3. **Supervisor**: Runs as the configured user (PUID:PGID) to manage child processes
+2. **Init Script**: Sets up timezone, adjusts user/group IDs to match running user, sets permissions
+3. **Supervisor**: Runs as the configured user to manage child processes
 4. **Logging**: All output goes to `/config/supervisord.log` with timestamps
 
 ## Building
@@ -68,5 +66,5 @@ This image is designed to be extended. Child images should:
 
 - **Base**: Alpine Linux (latest)
 - **Size**: ~169MB
-- **User**: nobody (configurable via PUID/PGID)
+- **User**: configurable via user: directive
 - **Shell**: /bin/bash

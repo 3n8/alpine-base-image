@@ -40,37 +40,26 @@ echo "[info] Image architecture: '${TARGETARCH}'" | ts '%Y-%m-%d %H:%M:%.S'
 
 echo "[info] Base image release tag: '${BASE_RELEASE_TAG}'" | ts '%Y-%m-%d %H:%M:%.S'
 
-export PUID=$(echo "${PUID}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-if [[ ! -z "${PUID}" ]]; then
-    echo "[info] PUID defined as '${PUID}'" | ts '%Y-%m-%d %H:%M:%.S'
-else
-    echo "[warn] PUID not defined (via -e PUID), defaulting to '1050'" | ts '%Y-%m-%d %H:%M:%.S'
-    export PUID="1050"
-fi
+export PUID=$(id -u)
+export PGID=$(id -g)
+
+echo "[info] Running as UID='${PUID}', GID='${PGID}'" | ts '%Y-%m-%d %H:%M:%.S'
 
 sed -i 's/^passwd:.*/passwd: files/' /etc/nsswitch.conf
 sed -i 's/^group:.*/group: files/' /etc/nsswitch.conf
 
 current_uid=$(id -u nobody 2>/dev/null || echo "99999")
 if [[ "${current_uid}" != "${PUID}" ]]; then
-    echo "[info] Executing usermod for PUID '${PUID}'..." | ts '%Y-%m-%d %H:%M:%.S'
+    echo "[info] Executing usermod to match UID '${PUID}'..." | ts '%Y-%m-%d %H:%M:%.S'
     usermod -o -u "${PUID}" nobody 2>/dev/null || true
     echo "[info] usermod completed successfully" | ts '%Y-%m-%d %H:%M:%.S'
 else
     echo "[info] User 'nobody' already has UID '${PUID}', skipping usermod" | ts '%Y-%m-%d %H:%M:%.S'
 fi
 
-export PGID=$(echo "${PGID}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-if [[ ! -z "${PGID}" ]]; then
-    echo "[info] PGID defined as '${PGID}'" | ts '%Y-%m-%d %H:%M:%.S'
-else
-    echo "[warn] PGID not defined (via -e PGID), defaulting to '1050'" | ts '%Y-%m-%d %H:%M:%.S'
-    export PGID="1050"
-fi
-
 current_gid=$(getent group users 2>/dev/null | cut -d: -f3 || echo "100")
 if [[ "${current_gid}" != "${PGID}" ]]; then
-    echo "[info] Executing groupmod for PGID '${PGID}'..." | ts '%Y-%m-%d %H:%M:%.S'
+    echo "[info] Executing groupmod to match GID '${PGID}'..." | ts '%Y-%m-%d %H:%M:%.S'
     groupmod -o -g "${PGID}" users 2>/dev/null || true
     echo "[info] groupmod completed successfully" | ts '%Y-%m-%d %H:%M:%.S'
 else

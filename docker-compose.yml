@@ -4,8 +4,6 @@ services:
     restart: always
     user: "${PUID}:${PGID}"
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
       - UMASK=${UMASK}
       - TZ=${TZ}
     volumes:
