@@ -17,7 +17,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       - name: Build and push
         run: |
-          docker build -t 3n8/alpine-base-image:latest .
-          docker push 3n8/alpine-base-image:latest
+          docker build -t 3n88/alpine-base-image:latest .
+          docker push 3n88/alpine-base-image:latest
       - name: Cleanup
-        run: docker rmi 3n8/alpine-base-image:latest || true
+        run: docker rmi 3n88/alpine-base-image:latest || true
