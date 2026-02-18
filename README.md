@@ -1,2 +1,72 @@
-# Trigger build
-# Trigger new build
+# Alpine Base Image
+
+A minimal Alpine Linux base image with supervisor, dumb-init, and PUID/PGID support for running containers as non-root users.
+
+## Features
+
+- **Alpine Linux** - Lightweight base (~169MB)
+- **dumb-init** - Proper signal handling and zombie process reaping
+- **Supervisor** - Process management with logging
+- **User/Group Mapping** - Run as any UID:GID via environment variables
+- **TZ Support** - Configurable timezone
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PUID` | 1050 | User ID to run as |
+| `PGID` | 1050 | Group ID to run as |
+| `UMASK` | 000 | File permissions mask |
+| `TZ` | UTC | Timezone (e.g., Europe/London, America/New_York) |
+
+## Volumes
+
+| Volume | Description |
+|--------|-------------|
+| `/config` | Persistent data directory (logs, configs, supervisord) |
+
+The `/config` directory is created automatically on first run with proper permissions.
+
+## Docker Compose Example
+
+```yaml
+services:
+  alpine-base:
+    image: 3n88/alpine-base-image:latest
+    restart: always
+    user: "${PUID}:${PGID}"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_HOME}/alpine-base:/config
+```
+
+## How It Works
+
+1. **Entry Point**: `dumb-init` handles signals (SIGTERM, SIGINT) for clean shutdown
+2. **Init Script**: Sets up timezone, adjusts user/group IDs, sets permissions
+3. **Supervisor**: Runs as the configured user (PUID:PGID) to manage child processes
+4. **Logging**: All output goes to `/config/supervisord.log` with timestamps
+
+## Building
+
+```bash
+docker build -t 3n88/alpine-base-image:latest .
+```
+
+## Base for Child Images
+
+This image is designed to be extended. Child images should:
+- Use `FROM 3n88/alpine-base-image:latest`
+- Copy scripts to `/usr/bin/init.sh` to customize startup
+- Create subdirectories under `/config` for their data
+
+## Image Details
+
+- **Base**: Alpine Linux (latest)
+- **Size**: ~169MB
+- **User**: nobody (configurable via PUID/PGID)
+- **Shell**: /bin/bash

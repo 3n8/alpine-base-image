@@ -20,6 +20,16 @@ EOF
 
 source '/etc/image-build-info'
 
+if [[ -z "${TZ}" ]]; then
+    export TZ="UTC"
+fi
+
+if [[ -f "/usr/share/zoneinfo/${TZ}" ]]; then
+    ln -sf "/usr/share/zoneinfo/${TZ}" /etc/localtime 2>/dev/null || true
+fi
+
+echo "[info] Timezone set to '${TZ}'" | ts '%Y-%m-%d %H:%M:%.S'
+
 if [[ "${HOST_OS,,}" == "unraid" ]]; then
     echo "[info] Host is running unRAID" | ts '%Y-%m-%d %H:%M:%.S'
 fi
@@ -126,8 +136,8 @@ else
     rm -f /tmp/* > /dev/null 2>&1 || true
 fi
 
-echo "[info] Starting Supervisor..." | ts '%Y-%m-%d %H:%M:%.S'
+echo "[info] Starting Supervisor as user 'nobody'..." | ts '%Y-%m-%d %H:%M:%.S'
 
 exec 1>&3 2>&4
 
-exec /usr/bin/supervisord -c /etc/supervisord.conf -n
+exec /usr/bin/gosu nobody /usr/bin/supervisord -c /etc/supervisord.conf -n

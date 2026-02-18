@@ -1,0 +1,12 @@
+services:
+  alpine-base:
+    image: 3n88/alpine-base-image:latest
+    restart: always
+    user: "${PUID}:${PGID}"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=${UMASK}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_HOME}/alpine-base:/config

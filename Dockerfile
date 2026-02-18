@@ -20,7 +20,8 @@ RUN apk add --no-cache \
         moreutils \
         shadow \
         supervisor \
-        dumb-init
+        dumb-init \
+        gosu
 
 COPY build/common/root/install.sh /tmp/install.sh
 COPY build/common/root/supervisord.conf /etc/supervisord.conf
