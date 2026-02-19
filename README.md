@@ -33,6 +33,7 @@ The `/config` directory is created automatically on first run with proper permis
 services:
   alpine-base:
     image: 3n88/alpine-base-image:latest
+    container_name: alpine-base
     restart: always
     user: "${PUID}:${PGID}"
     environment:
