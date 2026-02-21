@@ -1,4 +1,4 @@
-name: Build and Push to Docker Hub
+name: Build and Push to GitHub Container Registry
 on:
   push:
     branches: [master]
@@ -6,18 +6,22 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Login to Docker Hub
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
         run: |
-          docker build -t 3n88/alpine-base-image:latest .
-          docker push 3n88/alpine-base-image:latest
+          docker build -t ghcr.io/3n8/alpine-base-image:latest .
+          docker push ghcr.io/3n8/alpine-base-image:latest
       - name: Cleanup
-        run: docker rmi 3n88/alpine-base-image:latest || true
+        run: docker rmi ghcr.io/3n8/alpine-base-image:latest || true

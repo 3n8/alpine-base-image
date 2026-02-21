@@ -32,7 +32,7 @@ The `/config` directory is created automatically on first run with proper permis
 ```yaml
 services:
   alpine-base:
-    image: 3n88/alpine-base-image:latest
+    image: ghcr.io/3n8/alpine-base-image:latest
     container_name: alpine-base
     restart: always
     user: "${PUID}:${PGID}"
@@ -53,13 +53,13 @@ services:
 ## Building
 
 ```bash
-docker build -t 3n88/alpine-base-image:latest .
+docker build -t ghcr.io/3n8/alpine-base-image:latest .
 ```
 
 ## Base for Child Images
 
 This image is designed to be extended. Child images should:
-- Use `FROM 3n88/alpine-base-image:latest`
+- Use `FROM ghcr.io/3n8/alpine-base-image:latest`
 - Copy scripts to `/usr/bin/init.sh` to customize startup
 - Create subdirectories under `/config` for their data
 
