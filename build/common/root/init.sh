@@ -2,6 +2,12 @@
 
 set -e
 
+# Fail if running as root or pid 1 - container must run as non-root user
+if [[ $(id -u) -eq 0 ]] || [[ $$ -eq 1 ]]; then
+    echo "ERROR: Container must run as non-root user, not root (uid=$(id -u)) or pid 1 ($$)" >&2
+    exit 1
+fi
+
 exec 3>&1 4>&2 &> >(tee -a /config/supervisord.log)
 
 source '/usr/local/bin/system/scripts/docker/utils.sh'

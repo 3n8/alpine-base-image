@@ -5,7 +5,6 @@ services:
     restart: always
     user: "${PUID}:${PGID}"
     environment:
-      - UMASK=${UMASK}
       - TZ=${TZ}
     volumes:
       - ${DOCKER_HOME}/alpine-base:/config
