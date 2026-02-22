@@ -2,6 +2,10 @@
 
 A minimal Alpine Linux base image with supervisor, dumb-init, and user support for running containers as non-root users.
 
+## Important: Root Not Supported
+
+**This container MUST run as a non-root user.** The container will refuse to start if running as UID 0 (root). Use the `user:` directive in docker-compose to specify a non-root user.
+
 ## Features
 
 - **Alpine Linux** - Lightweight base (~169MB)
