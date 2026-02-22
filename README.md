@@ -14,10 +14,9 @@ A minimal Alpine Linux base image with supervisor, dumb-init, and user support f
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `UMASK` | 000 | File permissions mask |
 | `TZ` | UTC | Timezone (e.g., Europe/London, America/New_York) |
 
-The `user:` directive in docker-compose handles UID/GID - no environment variables needed.
+The `user:` directive in docker-compose handles UID/GID.
 
 ## Volumes
 
@@ -37,7 +36,6 @@ services:
     restart: always
     user: "${PUID}:${PGID}"
     environment:
-      - UMASK=${UMASK}
       - TZ=${TZ}
     volumes:
       - ${DOCKER_HOME}/alpine-base:/config
