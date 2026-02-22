@@ -2,9 +2,9 @@
 
 set -e
 
-# Fail if running as pid 1 - container should not be pid 1 (should use dumb-init)
-if [[ $$ -eq 1 ]]; then
-    echo "ERROR: Container should not run as pid 1 ($$), use dumb-init or similar init system" >&2
+# Fail if running as root (uid 0) - container must run as non-root user
+if [[ $(id -u) -eq 0 ]]; then
+    echo "ERROR: Container must run as non-root user (current uid=$(id -u)), use user: directive in docker-compose" >&2
     exit 1
 fi
 
