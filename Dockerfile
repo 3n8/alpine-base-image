@@ -31,7 +31,7 @@ RUN chmod +x /tmp/install.sh && /tmp/install.sh; rm -f /tmp/install.sh; \
     chmod +x /usr/bin/init.sh && \
     chmod +x /usr/local/bin/system/scripts/docker/utils.sh && \
     mkdir -p /config /data /config/run && \
-    chmod 775 /config /data /config/run
+    chmod -R 777 /config /data
 
 RUN echo "export BASE_RELEASE_TAG=${RELEASETAG}" > /etc/image-build-info && \
     echo "export TARGETARCH=${TARGETARCH}" >> /etc/image-build-info
