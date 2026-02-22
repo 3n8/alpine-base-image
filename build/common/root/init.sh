@@ -14,7 +14,7 @@ source '/usr/local/bin/system/scripts/docker/utils.sh'
 
 cat << "EOF"
 Created by...
-___.   .__       .__
+ ___.   .__       .__
 \_ |__ |__| ____ |  |__   ____ ___  ___
  | __ \|  |/    \|  |  \_/ __ \\  \/  /
  | \_\ \  |   |  \   Y  \  ___/ >    <
@@ -51,35 +51,6 @@ export PGID=$(id -g)
 
 echo "[info] Running as UID='${PUID}', GID='${PGID}'" | ts '%Y-%m-%d %H:%M:%.S'
 
-sed -i 's/^passwd:.*/passwd: files/' /etc/nsswitch.conf
-sed -i 's/^group:.*/group: files/' /etc/nsswitch.conf
-
-current_uid=$(id -u nobody 2>/dev/null || echo "99999")
-if [[ "${current_uid}" != "${PUID}" ]]; then
-    echo "[info] Executing usermod to match UID '${PUID}'..." | ts '%Y-%m-%d %H:%M:%.S'
-    usermod -o -u "${PUID}" nobody 2>/dev/null || true
-    echo "[info] usermod completed successfully" | ts '%Y-%m-%d %H:%M:%.S'
-else
-    echo "[info] User 'nobody' already has UID '${PUID}', skipping usermod" | ts '%Y-%m-%d %H:%M:%.S'
-fi
-
-current_gid=$(getent group users 2>/dev/null | cut -d: -f3 || echo "100")
-if [[ "${current_gid}" != "${PGID}" ]]; then
-    echo "[info] Executing groupmod to match GID '${PGID}'..." | ts '%Y-%m-%d %H:%M:%.S'
-    groupmod -o -g "${PGID}" users 2>/dev/null || true
-    echo "[info] groupmod completed successfully" | ts '%Y-%m-%d %H:%M:%.S'
-else
-    echo "[info] Group 'users' already has GID '${PGID}', skipping groupmod" | ts '%Y-%m-%d %H:%M:%.S'
-fi
-
-if [[ ! -z "${UMASK}" ]]; then
-    echo "[info] UMASK defined as '${UMASK}'" | ts '%Y-%m-%d %H:%M:%.S'
-    sed -i -e "s~umask.*~umask = ${UMASK}~g" /etc/supervisor/conf.d/*.conf 2>/dev/null || true
-else
-    echo "[warn] UMASK not defined (via -e UMASK), defaulting to '000'" | ts '%Y-%m-%d %H:%M:%.S'
-    sed -i -e "s~umask.*~umask = 000~g" /etc/supervisor/conf.d/*.conf 2>/dev/null || true
-fi
-
 if [[ ! -f "/config/perms.txt" ]]; then
     if [[ -d "/config" ]]; then
         echo "[info] Setting ownership and permissions recursively on '/config'..." | ts '%Y-%m-%d %H:%M:%.S'
@@ -91,7 +62,7 @@ if [[ ! -f "/config/perms.txt" ]]; then
         set -e
 
         if (( exit_code_chown != 0 || exit_code_chmod != 0 )); then
-            echo "[warn] Unable to chown/chmod '/config', assuming SMB mountpoint" | ts '%Y-%m-%d %H:%M:%.S'
+            echo "[warn] Unable to chown/chmod '/config', assuming SMB/NFS mountpoint" | ts '%Y-%m-%d %H:%M:%.S'
         else
             echo "[info] Successfully set ownership and permissions on '/config'" | ts '%Y-%m-%d %H:%M:%.S'
         fi
@@ -109,7 +80,7 @@ if [[ ! -f "/config/perms.txt" ]]; then
         set -e
 
         if (( exit_code_chown != 0 || exit_code_chmod != 0 )); then
-            echo "[info] Unable to chown/chmod '/data', assuming SMB mountpoint" | ts '%Y-%m-%d %H:%M:%.S'
+            echo "[info] Unable to chown/chmod '/data', assuming SMB/NFS mountpoint" | ts '%Y-%m-%d %H:%M:%.S'
         else
             echo "[info] Successfully set ownership and permissions on '/data'" | ts '%Y-%m-%d %H:%M:%.S'
         fi
@@ -130,6 +101,9 @@ else
     echo "[info] Deleting files in /tmp (non recursive)..." | ts '%Y-%m-%d %H:%M:%.S'
     rm -f /tmp/* > /dev/null 2>&1 || true
 fi
+
+mkdir -p /config/run
+chmod 775 /config/run
 
 echo "[info] Starting Supervisor..." | ts '%Y-%m-%d %H:%M:%.S'
 
