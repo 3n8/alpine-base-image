@@ -102,8 +102,10 @@ else
     rm -f /tmp/* > /dev/null 2>&1 || true
 fi
 
-mkdir -p /config/run
-chmod 775 /config/run
+set +e
+mkdir -p /config/run 2>/dev/null
+chmod 775 /config/run 2>/dev/null
+set -e
 
 echo "[info] Starting Supervisor..." | ts '%Y-%m-%d %H:%M:%.S'
 
