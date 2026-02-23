@@ -1,6 +1,6 @@
 FROM alpine:latest
-LABEL maintainer="binhex"
-LABEL org.opencontainers.image.source="https://github.com/binhex/arch-base"
+LABEL maintainer="3n8"
+LABEL org.opencontainers.image.source="https://github.com/3n8/alpine-base-image"
 
 ARG APPNAME=alpine-base
 ARG RELEASETAG=latest
